@@ -1,6 +1,4 @@
 
-model_trained = False
-
 # coding: utf-8
 
 # In[2]:
@@ -12,6 +10,9 @@ import datetime
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
 
+
+model_trained = False
+knn = KNeighborsRegressor(n_neighbors=7, weights='distance')
 
 # In[3]:
 
@@ -27,23 +28,20 @@ def train_model():
     y = np.array([consumo_energia['consumption']]).reshape(-1, 1)
   
 
-    knn = KNeighborsRegressor(n_neighbors=7, weights='distance')
-    knn = knn.fit(x, y)
+    
+    knn.fit(x, y)
     
     model_trained = True
 
-    return knn
 
 def predict_one_day(week_day):
     week_days = ("Monday", "Tuesday", "Wednesday",
              "Thursday", "Friday", "Saturday", "Sunday")
     
 
-    knn = train_model()
-    result  = knn.predict(np.array([week_day]).reshape(-1, 1))
-
-    
-    data = json.loads({week_days[week_day] : result})
+    result  = knn.predict(np.array(week_day).reshape(-1, 1))
+    result.tolist()
+    data =  {week_days[week_day] : result}
     return data
 
 def predict_week():
@@ -51,13 +49,12 @@ def predict_week():
              "Thursday", "Friday", "Saturday", "Sunday")
     
     int_week_days = np.arange(1, 8).reshape(-1, 1)
-    knn = train_model()
-    result  = knn.predict(np.array([int_week_days]))
+    result = knn.predict(int_week_days).tolist()
 
     data = {}
 
     for i in range(7):
-        data[week_days[i]] = [result[i]]
+        data[week_days[i]] = result[i]
     return data
 
 

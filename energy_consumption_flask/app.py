@@ -1,21 +1,33 @@
-from flask import Flask
+from flask import Flask, jsonify
 import consumo_de_energia_KNN
 app = Flask(__name__)
 
 
-@app.route('/predict/oneday/<int:week_day>')
-def predict_one_day(week_day):
-    if consumo_de_energia_KNN.model_trained:
-        return consumo_de_energia_KNN.predict_one_day(week_day)
-    else:
-        consumo_de_energia_KNN.train_model()
-        print(consumo_de_energia_KNN.predict_one_day(week_day))
-        return None
+@app.route('/')
+def api_root():
+    return 'Welcome'
 
-@app.route('/predict/week/')
-def predict_week():
-    if consumo_de_energia_KNN.model_trained:
-        return consumo_de_energia_KNN.predict_week
-    else:
+
+@app.route('/predict/oneday/<int:week_day>/', methods=['GET'])
+def predict_one_day(week_day):
+    if not(consumo_de_energia_KNN.model_trained):
         consumo_de_energia_KNN.train_model()
-        return consumo_de_energia_KNN.predict_week()
+
+    resp = jsonify(consumo_de_energia_KNN.predict_one_day(week_day))
+    resp.status_code = 200
+    return resp
+
+
+@app.route('/predict/week/', methods=['GET'])
+def predict_week():
+    if not(consumo_de_energia_KNN.model_trained):
+        consumo_de_energia_KNN.train_model()
+
+    resp = jsonify(consumo_de_energia_KNN.predict_week())
+    resp.status_code = 200
+    print(resp)
+    return resp
+
+
+if __name__ == 'main':
+    app.run(debug=True)
