@@ -9,35 +9,31 @@ import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.externals import joblib
 
-
-model_trained = False
-knn = KNeighborsRegressor(n_neighbors=7, weights='distance')
 
 # In[3]:
 
-def train_model():
+def train_model(neighbors = 7):
 
+    knn = KNeighborsRegressor(n_neighbors=neighbors, weights='distance')
     consumo_energia = pd.read_csv('Consumo.csv')
-
-
-    # In[4]:
 
 
     x = np.array([consumo_energia['weekDay']]).reshape(-1, 1)
     y = np.array([consumo_energia['consumption']]).reshape(-1, 1)
   
-
     
     knn.fit(x, y)
+    joblib.dump(knn, 'knn_energy_consumption.pkl')
     
-    model_trained = True
 
 
 def predict_one_day(week_day):
     week_days = ("Monday", "Tuesday", "Wednesday",
              "Thursday", "Friday", "Saturday", "Sunday")
     
+    knn = joblib.load('knn_energy_consumption.pkl')
 
     result  = knn.predict(np.array(week_day).reshape(-1, 1))
     result.tolist()
@@ -47,6 +43,8 @@ def predict_one_day(week_day):
 def predict_week():
     week_days = ("Monday", "Tuesday", "Wednesday",
              "Thursday", "Friday", "Saturday", "Sunday")
+    
+    knn = joblib.load('knn_energy_consumption.pkl')
     
     int_week_days = np.arange(1, 8).reshape(-1, 1)
     result = knn.predict(int_week_days).tolist()
