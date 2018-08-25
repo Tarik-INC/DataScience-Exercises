@@ -17,13 +17,17 @@ def train():
         data_post = request.json
         consumo_de_energia_KNN.train_model(neighbors = data_post['neighbors'])
    
-@app.route('/predict/oneday/<int:week_day>/', methods=['GET'])
+@app.route('/predict/oneday/', methods=['POST'])
 def predict_one_day(week_day):
     
-
-    resp = jsonify(consumo_de_energia_KNN.predict_one_day(week_day))
-    resp.status_code = 200
-    return resp
+    
+    if request.headers['Content-Type'] == 'application/json':
+        int_request_data = int(request.json['day'])
+        resp = jsonify(consumo_de_energia_KNN.predict_one_day(int_request_data))
+        resp.status_code = 200
+        return resp
+    else:
+        return None
 
 
 @app.route('/predict/week/', methods=['GET'])
@@ -31,7 +35,6 @@ def predict_week():
     
     resp = jsonify(consumo_de_energia_KNN.predict_week())
     resp.status_code = 200
-    print(resp)
     return resp
 
 
