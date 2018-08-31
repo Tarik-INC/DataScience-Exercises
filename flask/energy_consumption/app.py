@@ -3,6 +3,18 @@ import consumo_de_energia_KNN
 app = Flask(__name__)
 
 
+@app.errorhandler(400)
+def invalid_json(error=None):
+    message = {
+        'status': 400,
+        'message': 'Bad Request: ' + request.url,
+    }
+    resp = jsonify(message)
+    resp.status_code = 400
+
+    return resp
+
+
 @app.route('/')
 def api_root():
     return 'Welcome'
@@ -22,13 +34,19 @@ def train():
 def predict_one_day(week_day):
 
     if request.headers['Content-Type'] == 'application/json':
-        int_request_data = int(request.json['day'])
+        
+        try:
+            int_request_data = int(request.json['day'])
+        except KeyError :
+            invalid_json()
+       
         resp = jsonify(
             consumo_de_energia_KNN.predict_one_day(int_request_data))
+        
         resp.status_code = 200
         return resp
     else:
-        return None
+         invalid_json()
 
 
 @app.route('/predict/week/', methods=['GET'])
