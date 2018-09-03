@@ -32,8 +32,8 @@ def predict_one_day(week_day):
 
     knn = joblib.load('knn_energy_consumption.pkl')
 
-    result = knn.predict(np.array(week_day).reshape(-1, 1))
-    result.tolist()
+    result_2d_array = knn.predict(np.array(week_day).reshape(-1, 1))
+    result = result_2d_array[0][0]
     data = {week_days[week_day]: result}
     return data
 
@@ -50,7 +50,7 @@ def predict_week():
     data = {}
 
     for i in range(7):
-        data[week_days[i]] = result[i]
+        data[week_days[i]] = result[i][0]
     return data
 
 
