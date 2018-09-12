@@ -24,11 +24,12 @@ def api_root():
 def train():
     if(request.method == 'GET'):
         consumo_de_energia_KNN.train_model()
+        return resp.status_code = 200
 
     elif(request.method == 'POST' and request.headers['Content-Type'] == 'application/json'):
         data_post = request.json
         consumo_de_energia_KNN.train_model(neighbors=data_post['neighbors'])
-
+        return resp.status_code = 200
 
 @app.route('/predict/oneday/', methods=['POST'])
 def predict_one_day(week_day):
